@@ -1,0 +1,38 @@
+{
+  "name": "sahayak-intern",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-popover": "^1.0.7",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.0",
+    "cloudinary": "^2.1.0",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.376.0",
+    "mongoose": "^8.3.3",
+    "next": "14.2.3",
+    "next-auth": "^5.0.0-beta.17",
+    "next-cloudinary": "^6.3.0",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-icons": "^5.2.0",
+    "tailwind-merge": "^2.3.0",
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.23.5"
+  },
+  "devDependencies": {
+    "eslint": "^8",
+    "eslint-config-next": "14.2.3",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1"
+  }
+}
