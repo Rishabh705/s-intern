@@ -11,6 +11,7 @@ import {
 import Link from 'next/link';
 import { FaMinusCircle, FaPlusCircle, FaTrashAlt } from 'react-icons/fa';
 import AddressContext from '@/contexts/address';
+import MaxWidthWrapper from '@/components/MaxWidthWrapper';
 
 export default function Page() {
     const { cart, setCart } = useContext(CartContext);
@@ -119,7 +120,7 @@ export default function Page() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto p-4">
+        <MaxWidthWrapper>
             <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
             {products.length === 0 ? (
                 <p>Your cart is empty.</p>
@@ -159,6 +160,6 @@ export default function Page() {
                     )}
                 </>
             )}
-        </div>
+        </MaxWidthWrapper>
     );
 }

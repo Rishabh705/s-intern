@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaMinusCircle, FaPlusCircle, FaTrashAlt } from 'react-icons/fa';
-import { getOrders, getProductwithId } from '@/lib/api';
+import { FaTrashAlt } from 'react-icons/fa';
+import { getOrders, getDetail, deleteOrder } from '@/lib/api';
 import {
     Card,
     CardContent,
     CardDescription,
+    CardHeader,
     CardTitle,
 } from "@/components/ui/card"
 import { cn } from "@/lib/utils";
@@ -15,7 +16,10 @@ import MaxWidthWrapper from '@/components/MaxWidthWrapper';
 
 export default function Orders() {
     const [orders, setOrders] = useState([]);
-    const [cart, setCart] = useState(new Map());
+    const [status, setStatus] = useState();
+    const [productDetails, setProductDetails] = useState({});
+    const [deleteFeedback, setDeleteFeedback] = useState("");
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -24,6 +28,8 @@ export default function Orders() {
                 setOrders(ordersData);
             } catch (error) {
                 console.error('Error fetching orders:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
@@ -31,51 +37,94 @@ export default function Orders() {
     }, []);
 
     useEffect(() => {
-        const populateCart = () => {
-            const newCart = new Map();
-            orders.forEach(order => {
-                const id = order.productId.toString();
-                newCart.set(id, (newCart.get(id) || 0) + 1);
-            });
-            setCart(newCart);
+        const fetchProductDetails = async () => {
+            const productDetailsMap = {};
+            for (const order of orders) {
+                for (const item of order.items) {
+                    if (!productDetailsMap[item.productId]) {
+                        try {
+                            const product = await getDetail(item.productId);
+                            productDetailsMap[item.productId] = product;
+                        } catch (error) {
+                            console.error('Error fetching product details:', error);
+                        }
+                    }
+                }
+            }
+            setProductDetails(productDetailsMap);
         };
 
-        populateCart();
+        fetchProductDetails();
     }, [orders]);
 
-    const cards = Array.from(cart.entries()).map(async ([productId, numberOfItems]) => {
+    const handleDelete = async (orderId) => {
         try {
-            const product = await getProductwithId(productId);
-            return (
-                <Link href={`/${productId}`} key={productId}>
-                    <Card className='shadow-md hover:shadow-lg'>
-                        <CardContent className="flex justify-between p-4">
-                            <div className='space-y-4 h-full'>
-                                <CardTitle>{product.name.length > 50 ? `${product.name.slice(0, 50)}...` : product.name}</CardTitle>
-                                <CardDescription>Rs. {product.price}</CardDescription>
-                            </div>
-                            <div className='flex gap-2 min-h-full items-center'>
-                                <FaPlusCircle />
-                                {numberOfItems}
-                                <FaMinusCircle />
-                                <FaTrashAlt color='red' />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </Link>
-            );
+            const res = await deleteOrder(orderId);
+            if (res) {
+                setStatus(true);
+
+                const ordersData = await getOrders();
+                setOrders(ordersData);
+                
+                setDeleteFeedback("Order deleted successfully.");
+            } else {
+                setStatus(false);
+                setDeleteFeedback("Failed to delete order. Please try again later.");
+            }
+
         } catch (error) {
-            console.error('Error fetching product details:', error);
-            return null;
+            console.error(error);
+            setStatus(false);
+            setDeleteFeedback("Failed to delete order. Please try again later.");
         }
-    });
+    }
 
     return (
         <MaxWidthWrapper>
             <h1 className='mt-3 text-2xl font-semibold'>My Orders</h1>
-            <div className={cn('flex flex-col gap-y-6', "py-6")}>
-                {cards}
-            </div>
+            {isLoading ? (
+                <p>Loading...</p>
+            ) : orders.length === 0 ? (
+                <p>No orders found.</p>
+            ) : (
+                <div className={cn('flex flex-col gap-y-6', "py-6")}>
+                    {orders.map((order, index) => (
+                        <Card key={order.orderId}>
+                            <CardHeader>
+                                <CardTitle className="text-xl font-semibold">Order #{index + 1}</CardTitle>
+                            </CardHeader>
+                            <CardContent className='flex justify-between items-end'>
+                                <div>
+                                    <CardDescription className="text-gray-500">Total Amount: Rs. {order.totalAmount}</CardDescription>
+                                    <CardDescription className="text-gray-500">Order Date: {new Date(order.createdOn).toLocaleDateString()}</CardDescription>
+                                    <CardDescription className="text-gray-500">Address: {order.userAddress.City}, {order.userAddress.Country}, {order.userAddress.ZipCode}</CardDescription>
+                                    <div className="mt-2">
+                                        {order.items.map((item, idx) => {
+                                            const product = productDetails[item.productId];
+                                            return product ? (
+                                                <div key={idx} className="flex items-center justify-between">
+                                                    <div>
+                                                        <Link href={`/${item.productId}`}>Name of item: {product.name}</Link>
+                                                        <p>{item.boughtQuantity} x Rs. {product.price} = Rs. {(item.boughtQuantity * product.price).toFixed(2)}</p>
+                                                    </div>
+                                                </div>
+                                            ) : null;
+                                        })}
+                                    </div>
+                                </div>
+                                <span onClick={() => handleDelete(order.orderId)} className='hover:cursor-pointer'>
+                                    <FaTrashAlt color='red' size={25} />
+                                </span>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
+            {status !== undefined && (
+                <div className={`mt-4 text-sm ${status ? 'text-green-600' : 'text-red-600'}`}>
+                    {deleteFeedback}
+                </div>
+            )}
         </MaxWidthWrapper>
     );
 }

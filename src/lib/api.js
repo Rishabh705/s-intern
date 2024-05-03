@@ -194,3 +194,21 @@ export async function createOrder(newOrderData) {
     return null; // Return null in case of an error
   }
 }
+
+export async function deleteOrder(orderID) {
+  try {
+    const res = await fetch(`${url}/orders/${orderID}`, {
+      method: 'DELETE'
+    },{ next: { revalidate: 1 } });
+
+    if (!res.ok) {
+      throw new Error(`Failed to delete product: ${res.statusText} (${res.status})`);
+    }
+    
+    return true; // Return true if deletion is successful
+    
+  } catch (error) {
+    console.error(`Error deleting order with ID ${orderID}:`, error);
+    return false; // Return false in case of an error
+  }
+}

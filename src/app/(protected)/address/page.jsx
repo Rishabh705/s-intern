@@ -1,10 +1,11 @@
 'use client'
 
+import MaxWidthWrapper from '@/components/MaxWidthWrapper';
 import AddressContext from '@/contexts/address';
 import React, { useState, useContext, useEffect } from 'react';
 
 const AddressPage = () => {
-    const {address, setAddress} = useContext(AddressContext)
+    const { address, setAddress } = useContext(AddressContext)
 
     useEffect(() => {
         const savedAddress = localStorage.getItem('address');
@@ -36,7 +37,7 @@ const AddressPage = () => {
     };
 
     return (
-        <div className="max-w-lg mx-auto p-4">
+        <MaxWidthWrapper>
             <h1 className="text-2xl font-bold mb-4">Current Address</h1>
             <div className="bg-white rounded-lg shadow-md p-4 mb-4">
                 <p><strong>City:</strong> {address.City}</p>
@@ -104,7 +105,7 @@ const AddressPage = () => {
                     </div>
                 </form>
             )}
-        </div>
+        </MaxWidthWrapper>
     );
 };
 
