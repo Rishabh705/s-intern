@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils'
 import { FilterProvider } from "@/contexts/filter";
 import { DeleteProvider } from "@/contexts/delete";
 import { CartProvider } from "@/contexts/cart";
+import { AddressProvider } from "@/contexts/address";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,9 @@ export default function RootLayout({ children }) {
             <FilterProvider>
               <DeleteProvider>
                 <CartProvider>
-                  {children}
+                  <AddressProvider>
+                    {children}
+                  </AddressProvider>
                 </CartProvider>
               </DeleteProvider>
             </FilterProvider>

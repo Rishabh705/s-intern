@@ -1,7 +1,7 @@
 'use client'
 import React, { useContext, useState, useEffect } from 'react';
 import CartContext from '@/contexts/cart';
-import { getDetail } from '@/lib/api';
+import { createOrder, getDetail } from '@/lib/api';
 import {
     Card,
     CardContent,
@@ -10,11 +10,15 @@ import {
 } from "@/components/ui/card"
 import Link from 'next/link';
 import { FaMinusCircle, FaPlusCircle, FaTrashAlt } from 'react-icons/fa';
+import AddressContext from '@/contexts/address';
 
 export default function Page() {
     const { cart, setCart } = useContext(CartContext);
+    const { address } = useContext(AddressContext);
+
     const [products, setProducts] = useState([]);
     const [orderStatus, setOrderStatus] = useState('');
+    const [cartAmount, setCartAmount] = useState(0);
 
     useEffect(() => {
         // Load cart data from local storage on component mount
@@ -32,7 +36,7 @@ export default function Page() {
                         const productData = await getDetail(item.productId);
                         return {
                             ...productData,
-                            quantity: item.quantity
+                            boughtQuantity: item.boughtQuantity
                         };
                     })
                 );
@@ -45,12 +49,21 @@ export default function Page() {
         fetchProducts();
     }, [cart]);
 
+    useEffect(() => {
+        // Calculate total cart amount
+        let total = 0;
+        products.forEach(product => {
+            total += product.price * product.boughtQuantity;
+        });
+        setCartAmount(total);
+    }, [products]);
+
     const handleIncreaseQuantity = (e, productId) => {
         e.stopPropagation();
         e.preventDefault()
         const updatedCart = cart.map(item => {
             if (item.productId === productId) {
-                return { ...item, quantity: item.quantity + 1 };
+                return { ...item, boughtQuantity: item.boughtQuantity + 1 };
             }
             return item;
         });
@@ -63,8 +76,8 @@ export default function Page() {
         e.preventDefault()
 
         const updatedCart = cart.map(item => {
-            if (item.productId === productId && item.quantity > 1) {
-                return { ...item, quantity: item.quantity - 1 };
+            if (item.productId === productId && item.boughtQuantity > 1) {
+                return { ...item, boughtQuantity: item.boughtQuantity - 1 };
             }
             return item;
         });
@@ -72,7 +85,10 @@ export default function Page() {
         localStorage.setItem('cart', JSON.stringify(updatedCart)); // Update local storage
     };
 
-    const handleRemoveItem = (productId) => {
+    const handleRemoveItem = (e, productId) => {
+        e.stopPropagation();
+        e.preventDefault()
+
         const updatedCart = cart.filter(item => item.productId !== productId);
         setCart(updatedCart);
         localStorage.setItem('cart', JSON.stringify(updatedCart));
@@ -83,18 +99,12 @@ export default function Page() {
             const newOrderData = {
                 createdOn: new Date(),
                 items: cart,
-                userAddress: userAddress,
+                userAddress: address,
                 totalAmount: cartAmount
             };
-
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(cart),
-            });
-            if (response.ok) {
+            console.log(address);
+            const res = await createOrder(newOrderData);
+            if (res.ok) {
                 setOrderStatus('success');
                 // Clear the cart after successful order placement
                 setCart([]);
@@ -126,10 +136,10 @@ export default function Page() {
                                                 <CardDescription>Rs. {product.price}</CardDescription>
                                             </div>
                                             <div className='flex gap-2 min-h-full items-center absolute top-0 right-4 z-10'>
-                                                <FaPlusCircle onClick={() => handleIncreaseQuantity(product.productId)} />
-                                                {product.quantity}
-                                                <FaMinusCircle onClick={() => handleDecreaseQuantity(product.productId)} />
-                                                <FaTrashAlt color='red' onClick={() => handleRemoveItem(product.productId)} />
+                                                <FaPlusCircle onClick={(e) => handleIncreaseQuantity(e, product.productId)} size={20} />
+                                                {product.boughtQuantity}
+                                                <FaMinusCircle onClick={(e) => handleDecreaseQuantity(e, product.productId)} size={20} />
+                                                <FaTrashAlt color='red' onClick={(e) => handleRemoveItem(e, product.productId)} size={20} />
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -137,7 +147,10 @@ export default function Page() {
                             </Link>
                         ))}
                     </ul>
-                    <button onClick={handlePlaceOrder} className="bg-blue-500 text-white font-bold py-2 px-4 rounded mt-4">Place Order</button>
+                    <div className="flex justify-between items-center mt-4">
+                        <p className="font-semibold">Total Amount: Rs. {cartAmount}</p>
+                        <button onClick={handlePlaceOrder} className="bg-blue-500 text-white font-bold py-2 px-4 rounded">Place Order</button>
+                    </div>
                     {orderStatus === 'success' && (
                         <p className="text-green-600 mt-2">Order placed successfully!</p>
                     )}

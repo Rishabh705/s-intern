@@ -186,13 +186,8 @@ export async function createOrder(newOrderData) {
       },
       body: JSON.stringify(newOrderData)
     });
-    
-    if (!res.ok) {
-      throw new Error(`Failed to create product: ${res.statusText} (${res.status})`);
-    }
-    
-    const data = await res.json();
-    return data;
+
+    return res;
     
   } catch (error) {
     console.error(`Error creating order:`, error);

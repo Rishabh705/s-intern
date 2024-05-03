@@ -12,16 +12,10 @@ export default function AddToCart({ id }) {
     useEffect(() => {
         // Load cart data from local storage on component mount
         const savedCart = localStorage.getItem('cart');
-        console.log(savedCart);
         if (savedCart) {
             setCart(JSON.parse(savedCart));
         }
-    }, []);
-
-    useEffect(() => {
-        // Save cart data to local storage whenever cart changes
-        localStorage.setItem('cart', JSON.stringify(cart));
-    }, [cart]);
+    }, []); // Run only once on component mount
 
     const handleAddToCart = () => {
         try {
@@ -30,12 +24,14 @@ export default function AddToCart({ id }) {
             if (existingProductIndex !== -1) {
                 // If the product exists, update its quantity
                 const updatedCart = [...cart];
-                updatedCart[existingProductIndex].quantity += 1;
+                updatedCart[existingProductIndex].boughtQuantity += 1;
                 setCart(updatedCart);
             } else {
                 // If the product doesn't exist, add it to the cart
-                setCart(prevCart => [...prevCart, { productId: id, quantity: 1 }]);
+                setCart(prevCart => [...prevCart, { productId: id, boughtQuantity: 1 }]);
             }
+            // Update local storage with the updated cart data
+            localStorage.setItem('cart', JSON.stringify(cart));
             setStatus('success');
         } catch (error) {
             console.error(error);
@@ -70,4 +66,5 @@ export default function AddToCart({ id }) {
             )}
         </>
     );
+
 }

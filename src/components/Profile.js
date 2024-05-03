@@ -11,8 +11,8 @@ import { LuLogOut } from "react-icons/lu"
 import Link from "next/link"
 import { buttonVariants } from "./ui/button";
 import { auth,signOut } from "@/lib/auth";
-import { getFavs } from "@/lib/actions";
 import { IoIosCart } from "react-icons/io";
+import { FaMapMarker } from "react-icons/fa";
 
 export default async function Profile() {
     const session = await auth()
@@ -42,6 +42,12 @@ export default async function Profile() {
                                         <IoIosCart size={22} />
                                         <Link href='cart' className="flex-1 flex justify-between">
                                             My Cart
+                                        </Link>
+                                    </div>
+                                    <div className='flex gap-4 pr-6 hover:bg-slate-200 h-full pt-2 pb-2'>
+                                        <FaMapMarker size={20} />
+                                        <Link href='address' className="flex-1 flex justify-between">
+                                            My Address
                                         </Link>
                                     </div>
                                     <form 
