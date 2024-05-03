@@ -3,7 +3,7 @@ const url = process.env.NEXT_PUBLIC_URL
 export async function getAll(offset, min, max) {
   const url1 = `${url}/products/all?offset=${offset}&min_price=${min}&max_price=${max}`
   try {
-    const res = await fetch(url1)
+    const res = await fetch(url1, {mode:'no-cors'})
 
     if (!res.ok) {
       throw {
@@ -25,7 +25,7 @@ export async function getAll(offset, min, max) {
 export async function getDetail(id) {
   
   try {
-    const res = await fetch(`${url}/products/${id}`)
+    const res = await fetch(`${url}/products/${id}`,{mode:'no-cors'})
     if (!res.ok) {
       throw {
         message: "Failed to fetch records",
@@ -49,7 +49,7 @@ export async function getDetail(id) {
 export async function getLimitedProducts(limit) {
 
   try {
-    const res = await fetch(`${url}/products/all?limit=${limit}`)
+    const res = await fetch(`${url}/products/all?limit=${limit}`,{mode:'no-cors'})
 
     if (!res.ok) {
       throw {
@@ -71,7 +71,7 @@ export async function getLimitedProducts(limit) {
 export async function getFilteredProducts(min, max) {
 
   try {
-    const res = await fetch(`${url}/products/all?min_price=${min}&max_price=${max}`)
+    const res = await fetch(`${url}/products/all?min_price=${min}&max_price=${max}`, {mode:'no-cors'})
 
     if (!res.ok) {
       throw {
@@ -93,6 +93,7 @@ export async function getFilteredProducts(min, max) {
 export async function createProduct(newProductData) {
   try {
     const res = await fetch(`${url}/products/create`, {
+      mode: 'no-cors',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -116,6 +117,7 @@ export async function createProduct(newProductData) {
 export async function updateProduct(productId, updatedProductData) {
   try {
     const res = await fetch(`${url}/products/${productId}`, {
+      mode: 'no-cors',
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -139,6 +141,7 @@ export async function updateProduct(productId, updatedProductData) {
 export async function deleteProduct(productId) {
   try {
     const res = await fetch(`${url}/products/${productId}`, {
+      mode: 'no-cors',
       method: 'DELETE'
     },{ next: { revalidate: 1 } });
 
@@ -157,7 +160,7 @@ export async function deleteProduct(productId) {
 export async function getOrders() {
 
   try {
-    const res = await fetch(`${url}/orders/all`)
+    const res = await fetch(`${url}/orders/all`, {mode:'no-cors'})
 
     if (!res.ok) {
       throw {
@@ -180,6 +183,7 @@ export async function createOrder(newOrderData) {
   try {
     console.log(newOrderData);
     const res = await fetch(`${url}/orders/create`, {
+      mode: 'no-cors',
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -198,6 +202,7 @@ export async function createOrder(newOrderData) {
 export async function deleteOrder(orderID) {
   try {
     const res = await fetch(`${url}/orders/${orderID}`, {
+      mode: 'no-cors',
       method: 'DELETE'
     },{ next: { revalidate: 1 } });
 
@@ -217,6 +222,7 @@ export async function updateOrder(orderID, updatedOrderData) {
   try {
     const res = await fetch(`${url}/orders/${orderID}`, {
       method: 'PUT',
+      mode: 'no-cors',
       headers: {
         'Content-Type': 'application/json'
       },
