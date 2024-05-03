@@ -19,7 +19,7 @@ const Home = ({ searchParams }) => {
           <p className='mt-6 text-lg max-w-prose text-muted-foreground'>
             Welcome to ekart, where every product on our platform undergoes rigorous verification by our team, ensuring high-quality.
           </p>
-          <SearchBox />
+          {/* <SearchBox /> */}
         </div>
       </MaxWidthWrapper>
 
