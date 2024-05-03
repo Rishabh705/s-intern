@@ -26,18 +26,22 @@ export default function AddToCart({ id }) {
                 const updatedCart = [...cart];
                 updatedCart[existingProductIndex].boughtQuantity += 1;
                 setCart(updatedCart);
+                // Update local storage with the updated cart data
+                localStorage.setItem('cart', JSON.stringify(updatedCart));
             } else {
                 // If the product doesn't exist, add it to the cart
-                setCart(prevCart => [...prevCart, { productId: id, boughtQuantity: 1 }]);
+                const newCart = [...cart, { productId: id, boughtQuantity: 1 }];
+                setCart(newCart);
+                // Update local storage with the updated cart data
+                localStorage.setItem('cart', JSON.stringify(newCart));
             }
-            // Update local storage with the updated cart data
-            localStorage.setItem('cart', JSON.stringify(cart));
             setStatus('success');
         } catch (error) {
             console.error(error);
             setStatus('error');
         }
     };
+    
    
     return (
         <>
