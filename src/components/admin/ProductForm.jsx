@@ -1,20 +1,47 @@
 'use client'
 
-import { postProduct } from '@/lib/actions'
-import { useFormState, useFormStatus } from 'react-dom'
-import { FaExclamationTriangle } from "react-icons/fa"
-import { FaCheckCircle } from 'react-icons/fa'
+import React, { useState } from 'react';
+import { createProduct } from '@/lib/api';
+import { useFormStatus } from 'react-dom';
+import { FaExclamationTriangle, FaCheckCircle } from "react-icons/fa";
+
 const ProductForm = () => {
-    const [message, clientAction] = useFormState(postProduct, undefined)
+    const [formData, setFormData] = useState({
+        name: '',
+        price: '',
+        quantity: ''
+    });
+    const [message, setMessage] = useState(null);
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData({
+            ...formData,
+            [name]: value
+        });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await createProduct(formData);
+            setMessage({ success: true, msg: 'Product created successfully.' });
+            setFormData({ name: '', price: '', quantity: '' });
+        } catch (error) {
+            setMessage({ success: false, msg: 'Failed to create product. Please try again later.' });
+        }
+    };
 
     return (
-        <form action={clientAction} className="max-w-md mx-auto mt-8">
+        <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8">
             <div className="mb-4">
                 <label htmlFor="name" className="block mb-2">Name:</label>
                 <input
                     type="text"
                     id="name"
                     name="name"
+                    value={formData.name}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-md"
                 />
             </div>
@@ -24,6 +51,8 @@ const ProductForm = () => {
                     type='text'
                     id="price"
                     name="price"
+                    value={formData.price}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-md"
                 />
             </div>
@@ -33,6 +62,8 @@ const ProductForm = () => {
                     type="number"
                     id="quantity"
                     name="quantity"
+                    value={formData.quantity}
+                    onChange={handleChange}
                     className="w-full px-3 py-2 border rounded-md"
                 />
             </div>
@@ -60,13 +91,15 @@ const ProductForm = () => {
         </form>
     );
 };
+
 function Button() {
     const { pending } = useFormStatus();
 
     return (
-        <button className="mt-8 w-full p-2 rounded-md text-white bg-blue-500 hover:bg-blue-400" aria-disabled={pending}>
+        <button type="submit" className="mt-8 w-full p-2 rounded-md text-white bg-blue-500 hover:bg-blue-400" aria-disabled={pending}>
             {pending ? "Submitting..." : "Submit"}
         </button>
     );
 }
+
 export default ProductForm;

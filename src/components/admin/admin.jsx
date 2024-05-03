@@ -1,9 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ProductForm from "./ProductForm"
 import MaxWidthWrapper from "../MaxWidthWrapper"
-import { Button } from "../ui/button"
 import AdminResults from "./AdminResults"
-import MuliDele from "../MuliDele"
 
 export default function Admin() {
     return (
@@ -15,7 +13,6 @@ export default function Admin() {
                             <TabsTrigger value="home">All Products</TabsTrigger>
                             <TabsTrigger value="add-product">Add Product</TabsTrigger>
                         </TabsList>
-                       <MuliDele/>
                     </div>
                     <TabsContent value="home"><AdminResults/></TabsContent>
                     <TabsContent value="add-product"><ProductForm /></TabsContent>

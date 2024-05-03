@@ -14,10 +14,10 @@ const Home = ({ searchParams }) => {
       <MaxWidthWrapper>
         <div className='py-20 mx-auto text-center flex flex-col items-center max-w-3xl'>
           <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-6xl'>
-            Your Ultimate  Destination for <span className='bg-gradient-to-r from-sky-500 to-indigo-500 inline-block text-transparent bg-clip-text'>Premium News</span>
+            Your Ultimate  Market for <span className='bg-gradient-to-r from-sky-500 to-indigo-500 inline-block text-transparent bg-clip-text'>Premium Items</span>
           </h1>
           <p className='mt-6 text-lg max-w-prose text-muted-foreground'>
-            Welcome to NewsNxt, where every piece of news on our platform undergoes rigorous verification by our team, ensuring high-quality and truth.
+            Welcome to ekart, where every product on our platform undergoes rigorous verification by our team, ensuring high-quality.
           </p>
           <SearchBox />
         </div>
