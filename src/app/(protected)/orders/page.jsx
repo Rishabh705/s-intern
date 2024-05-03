@@ -113,9 +113,9 @@ export default function Orders() {
     const handleCancel = () => {
         setEditingOrder(null);
         setLocalOrderChanges({});
-      };
+    };
 
-      const handleQuantityChange = (orderId, productId, newQuantity, price) => {
+    const handleQuantityChange = (orderId, productId, newQuantity, price) => {
         // Find the index of the order being edited
         const orderIndex = orders.findIndex(order => order.orderId === orderId);
         // Make a shallow copy of the orders array
@@ -127,23 +127,27 @@ export default function Orders() {
         // Update the quantity of the item
         updatedItem.boughtQuantity = newQuantity;
         updatedItem.amount = newQuantity * price;
-        
+
         // Update the item in the shallow copy of the orders array
         updatedOrders[orderIndex].items[itemIndex] = updatedItem;
-    
+
         // Recalculate total amount for the order
         let totalAmount = 0;
         updatedOrders[orderIndex].items.forEach(item => {
             totalAmount += item.amount;
         });
         updatedOrders[orderIndex].totalAmount = totalAmount;
-    
-        // Update the localOrderChanges state with the updated orders array
-        setLocalOrderChanges({
-            ...localOrderChanges,
+
+        // Update the localOrderChanges state with the updated item
+        setLocalOrderChanges(prevLocalOrderChanges => ({
+            ...prevLocalOrderChanges,
             [orderId]: updatedOrders[orderIndex]
-        });
+        }));
+        console.log(localOrderChanges);
     }
+    useEffect(() => {
+        console.log(localOrderChanges);
+    }, [localOrderChanges]);
     
     return (
         <MaxWidthWrapper>
