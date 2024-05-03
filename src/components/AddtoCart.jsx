@@ -38,7 +38,7 @@ export default function AddToCart({ id }) {
             setStatus('error');
         }
     };
-
+   
     return (
         <>
             <button onClick={handleAddToCart}>
