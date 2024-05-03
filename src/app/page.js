@@ -13,7 +13,7 @@ const Home = ({ searchParams }) => {
     <>
       <MaxWidthWrapper>
         <div className='py-20 mx-auto text-center flex flex-col items-center max-w-3xl'>
-          <h1 className='text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl'>
+          <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-6xl'>
             Your Ultimate  Destination for <span className='bg-gradient-to-r from-sky-500 to-indigo-500 inline-block text-transparent bg-clip-text'>Premium News</span>
           </h1>
           <p className='mt-6 text-lg max-w-prose text-muted-foreground'>

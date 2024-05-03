@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { FaTrashAlt } from 'react-icons/fa';
-import { getOrders, getDetail, deleteOrder } from '@/lib/api';
+import { FaTrashAlt, FaPlus, FaMinus, FaEdit } from 'react-icons/fa';
+import { getOrders, getDetail, deleteOrder, updateOrder } from '@/lib/api';
 import {
     Card,
     CardContent,
@@ -20,6 +20,8 @@ export default function Orders() {
     const [productDetails, setProductDetails] = useState({});
     const [deleteFeedback, setDeleteFeedback] = useState("");
     const [isLoading, setIsLoading] = useState(true);
+    const [editingOrder, setEditingOrder] = useState(null); // Track which order is being edited
+    const [localOrderChanges, setLocalOrderChanges] = useState({}); // Track local changes to order items
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -65,7 +67,7 @@ export default function Orders() {
 
                 const ordersData = await getOrders();
                 setOrders(ordersData);
-                
+
                 setDeleteFeedback("Order deleted successfully.");
             } else {
                 setStatus(false);
@@ -79,6 +81,70 @@ export default function Orders() {
         }
     }
 
+    const handleEdit = (orderId) => {
+        setEditingOrder(orderId);
+    }
+
+    const handleSave = async (orderId) => {
+        try {
+            const newData = localOrderChanges[orderId];
+            const res = await updateOrder(orderId, newData);
+            if (res) {
+                setStatus(true);
+
+                const ordersData = await getOrders();
+                setOrders(ordersData);
+
+                // Handle success feedback
+            } else {
+                setStatus(false);
+                // Handle failure feedback
+            }
+        } catch (error) {
+            console.error(error);
+            setStatus(false);
+            // Handle failure feedback
+        } finally {
+            setEditingOrder(null); // Reset editing state after save
+            setLocalOrderChanges({}); // Clear local changes
+        }
+    }
+
+    const handleCancel = () => {
+        setEditingOrder(null);
+        setLocalOrderChanges({});
+      };
+
+      const handleQuantityChange = (orderId, productId, newQuantity, price) => {
+        // Find the index of the order being edited
+        const orderIndex = orders.findIndex(order => order.orderId === orderId);
+        // Make a shallow copy of the orders array
+        const updatedOrders = [...orders];
+        // Find the index of the item being edited
+        const itemIndex = updatedOrders[orderIndex].items.findIndex(item => item.productId === productId);
+        // Make a shallow copy of the item
+        const updatedItem = { ...updatedOrders[orderIndex].items[itemIndex] };
+        // Update the quantity of the item
+        updatedItem.boughtQuantity = newQuantity;
+        updatedItem.amount = newQuantity * price;
+        
+        // Update the item in the shallow copy of the orders array
+        updatedOrders[orderIndex].items[itemIndex] = updatedItem;
+    
+        // Recalculate total amount for the order
+        let totalAmount = 0;
+        updatedOrders[orderIndex].items.forEach(item => {
+            totalAmount += item.amount;
+        });
+        updatedOrders[orderIndex].totalAmount = totalAmount;
+    
+        // Update the localOrderChanges state with the updated orders array
+        setLocalOrderChanges({
+            ...localOrderChanges,
+            [orderId]: updatedOrders[orderIndex]
+        });
+    }
+    
     return (
         <MaxWidthWrapper>
             <h1 className='mt-3 text-2xl font-semibold'>My Orders</h1>
@@ -102,19 +168,48 @@ export default function Orders() {
                                         {order.items.map((item, idx) => {
                                             const product = productDetails[item.productId];
                                             return product ? (
-                                                <div key={idx} className="flex items-center justify-between">
+                                                <div key={idx}>
                                                     <div>
                                                         <Link href={`/${item.productId}`}>Name of item: {product.name}</Link>
-                                                        <p>{item.boughtQuantity} x Rs. {product.price} = Rs. {(item.boughtQuantity * product.price).toFixed(2)}</p>
+                                                        {editingOrder === order.orderId ? (
+                                                            <p className="flex items-center gap-4">
+                                                                <button onClick={() => handleQuantityChange(order.orderId, item.productId, item.boughtQuantity - 1, product.price)} disabled={item.boughtQuantity === 1}>
+                                                                    <FaMinus />
+                                                                </button>
+                                                                {item.boughtQuantity}
+                                                                <button onClick={() => handleQuantityChange(order.orderId, item.productId, item.boughtQuantity + 1, product.price)}>
+                                                                    <FaPlus />
+                                                                </button>
+                                                                x Rs. {product.price} = Rs. {(item.boughtQuantity * product.price).toFixed(2)}
+                                                            </p>
+                                                        ) : (
+                                                            <p>{item.boughtQuantity} x Rs. {product.price} = Rs. {(item.boughtQuantity * product.price).toFixed(2)}</p>
+                                                        )}
                                                     </div>
                                                 </div>
                                             ) : null;
                                         })}
                                     </div>
                                 </div>
-                                <span onClick={() => handleDelete(order.orderId)} className='hover:cursor-pointer'>
-                                    <FaTrashAlt color='red' size={25} />
-                                </span>
+                                <div className='flex gap-4'>
+                                    {editingOrder === order.orderId ? (
+                                        <>
+                                            <span className='hover:cursor-pointer' onClick={() => handleSave(order.orderId)}>
+                                                Save
+                                            </span>
+                                            <span className='hover:cursor-pointer' onClick={handleCancel}>
+                                                Cancel
+                                            </span>
+                                        </>
+                                    ) : (
+                                        <span className='hover:cursor-pointer' onClick={() => handleEdit(order.orderId)}>
+                                            <FaEdit color='green' size={25} />
+                                        </span>
+                                    )}
+                                    <span onClick={() => handleDelete(order.orderId)} className='hover:cursor-pointer'>
+                                        <FaTrashAlt color='red' size={25} />
+                                    </span>
+                                </div>
                             </CardContent>
                         </Card>
                     ))}

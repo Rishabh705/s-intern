@@ -36,9 +36,9 @@ const Detail = ({ params }) => {
     <MaxWidthWrapper>
       <div className='min-h-full w-2/3'>
         <div className='py-4 flex flex-col max-w-3xl gap-2'>
-          <h1 className='text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl'>{result.name}</h1>
-          <h3 className='mt-3'><span className='font-semibold'>Price: </span>{result.price}</h3>
-          <h4 className='text-slate-600 italic'>Quantity left: {result.quantity}</h4>
+          <h1 className='text-4xl font-bold tracking-tight text-foreground sm:text-5xl'>{result.name}</h1>
+          <h3 className='mt-3'><span className='font-semibold text-muted-foreground'>Price: </span>{result.price}</h3>
+          <h4 className='text-muted-foreground italic'>Quantity left: {result.quantity}</h4>
         </div>
         <AddtoCart id={params.id} />
       </div>

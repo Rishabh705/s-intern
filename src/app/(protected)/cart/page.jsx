@@ -103,7 +103,6 @@ export default function Page() {
                 userAddress: address,
                 totalAmount: cartAmount
             };
-            console.log(address);
             const res = await createOrder(newOrderData);
             if (res.ok) {
                 setOrderStatus('success');
@@ -121,7 +120,7 @@ export default function Page() {
 
     return (
         <MaxWidthWrapper>
-            <h1 className="text-2xl font-bold mb-4">Your Cart</h1>
+            <h1 className="text-2xl font-bold my-4">Your Cart</h1>
             {products.length === 0 ? (
                 <p>Your cart is empty.</p>
             ) : (

@@ -212,3 +212,26 @@ export async function deleteOrder(orderID) {
     return false; // Return false in case of an error
   }
 }
+
+export async function updateOrder(orderID, updatedOrderData) {
+  try {
+    const res = await fetch(`${url}/orders/${orderID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedOrderData)
+    });
+    
+    if (!res.ok) {
+      throw new Error(`Failed to update product: ${res.statusText} (${res.status})`);
+    }
+    
+    const data = await res.json();
+    return data;
+    
+  } catch (error) {
+    console.error(`Error updating order with ID ${orderID}:`, error);
+    return null; // Return null in case of an error
+  }
+}

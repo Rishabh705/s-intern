@@ -6,6 +6,7 @@ import { FilterProvider } from "@/contexts/filter";
 import { DeleteProvider } from "@/contexts/delete";
 import { CartProvider } from "@/contexts/cart";
 import { AddressProvider } from "@/contexts/address";
+import { ThemeProvider } from "@/contexts/theme";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -15,24 +16,32 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
   return (
-    <html lang="en" className='h-full'>
+    <html lang="en" className={`h-full`}>
       <body className={cn("relative h-full font-sans antialiased", inter.className)}>
-        <main className='relative flex flex-col min-h-screen'>
-          <Header />
-          <div className="flex-grow flex-1">
-            <FilterProvider>
-              <DeleteProvider>
-                <CartProvider>
-                  <AddressProvider>
-                    {children}
-                  </AddressProvider>
-                </CartProvider>
-              </DeleteProvider>
-            </FilterProvider>
-          </div>
-          {/* <Footer /> */}
-        </main>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <main className='relative flex flex-col min-h-screen '>
+            <Header />
+            <div className="flex-grow flex-1">
+              <FilterProvider>
+                <DeleteProvider>
+                  <CartProvider>
+                    <AddressProvider>
+                      {children}
+                    </AddressProvider>
+                  </CartProvider>
+                </DeleteProvider>
+              </FilterProvider>
+            </div>
+            {/* <Footer /> */}
+          </main>
+        </ThemeProvider>
       </body>
     </html>
   );
